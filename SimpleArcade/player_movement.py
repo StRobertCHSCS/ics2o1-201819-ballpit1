@@ -17,8 +17,6 @@ HEIGHT = 480
 score = 0
 
 # texture loading
-kelvin = arcade.load_texture("Textures_game/Screenshot-20181016-190732.PNG")
-kristen = arcade.load_texture("Textures_game/IMG-2607.JPG")
 background = arcade.load_texture("Textures_game/background.jpg")
 background_start = arcade.load_texture("Textures_game/giphy.gif")
 # start player position in middle of window
@@ -124,7 +122,6 @@ def on_draw():
     # Draw in here...
     arcade.draw_texture_rectangle(WIDTH / 2, HEIGHT / 2, 852, 480, background)
     arcade.draw_circle_filled(player_x, player_y, 25, arcade.color.RED)
-    #arcade.draw_texture_rectangle(player_x, player_y, 0.069 * 721, 0.069 * 801, kristen, 0)
 
     # Draw in here...
     arcade.draw_xywh_rectangle_filled(my_button[0],
@@ -133,7 +130,6 @@ def on_draw():
                                       my_button[3],
                                       arcade.color.BLACK)
     arcade.draw_rectangle_filled(center_x, center_y, RECT_WIDTH, RECT_HEIGHT, arcade.color.BLUE)
-    arcade.draw_texture_rectangle(center_x, center_y, 0.169 * 295, 0.169 * 305, kelvin, 0)
     arcade.draw_text("DEATH", 110, 210, (210, 255, 248), 30, font_name='CONSOLAS')
 
     arcade.draw_text("Score: " + str(score), 100, 50, arcade.color.BLACK, font_name='CONSOLAS')
@@ -141,8 +137,8 @@ def on_draw():
     arcade.draw_texture_rectangle(-320, -240, 640, 480, background_start)
 
     arcade.draw_text("Welcome to the Game \npress 'e' to start", -560, -100, (210, 255, 248), 30, font_name='CONSOLAS')
-    arcade.draw_text("Get close to Kelvin, \nbut dont touch him, \ntouching the black block kills you", -560, -200, (210, 255, 248), 15, font_name='CONSOLAS')
-    arcade.draw_text("Time does not matter, \nso if you manage to \nlast long enough for \nKelvin to disapear, \nuse the black block \nto kill yourslef", -560, -300, (210, 255, 248), 15, font_name='CONSOLAS')
+    arcade.draw_text("Get close to X , \nbut dont touch him, \ntouching the black block kills you", -560, -200, (210, 255, 248), 15, font_name='CONSOLAS')
+    arcade.draw_text("Time does not matter, \nso if you manage to \nlast long enough for \nX to disapear, \nuse the black block \nto kill yourslef", -560, -300, (210, 255, 248), 15, font_name='CONSOLAS')
     arcade.draw_text("Use W A S D to control", -560, -460, (210, 255, 248), 10, font_name='CONSOLAS')
 
     if dead:
