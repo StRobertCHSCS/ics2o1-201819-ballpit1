@@ -1,13 +1,13 @@
 import arcade
 import time
 
-WIDTH = 640
-HEIGHT = 480
 # start
 start = False
 dead_screen = False
+restart = False
 # time counter
 then = time.time()
+
 
 # window setup
 WIDTH = 640
@@ -19,6 +19,8 @@ score = 0
 # texture loading
 background = arcade.load_texture("Textures_game/background.jpg")
 background_start = arcade.load_texture("Textures_game/giphy.gif")
+virus = arcade.load_texture("Textures_game/computer+virus.png")
+laptop = arcade.load_texture("Textures_game/laptop-png-29.png")
 # start player position in middle of window
 player_x = WIDTH / 2
 player_y = HEIGHT / 2
@@ -69,6 +71,7 @@ def on_collision():
             score += 2
 
 
+
 def on_update(delta_time):
     global up_pressed, player_y, down_pressed, right_pressed, left_pressed, player_x
     if up_pressed:
@@ -116,12 +119,14 @@ def on_update(delta_time):
 
 
 def on_draw():
-    global player_x, player_y, dead, now, printed
+    global player_x, player_y, dead, now, printed, start, state, center_y, center_x, delta_x, delta_y, score
 
     arcade.start_render()
     # Draw in here...
     arcade.draw_texture_rectangle(WIDTH / 2, HEIGHT / 2, 852, 480, background)
-    arcade.draw_circle_filled(player_x, player_y, 25, arcade.color.RED)
+#    arcade.draw_circle_filled(player_x, player_y, 25, arcade.color.RED)
+
+    arcade.draw_texture_rectangle(player_x, player_y, 0.15*laptop.width, 0.15*laptop.height, laptop, 0)
 
     # Draw in here...
     arcade.draw_xywh_rectangle_filled(my_button[0],
@@ -129,30 +134,38 @@ def on_draw():
                                       my_button[2],
                                       my_button[3],
                                       arcade.color.BLACK)
-    arcade.draw_rectangle_filled(center_x, center_y, RECT_WIDTH, RECT_HEIGHT, arcade.color.BLUE)
-    arcade.draw_text("DEATH", 110, 210, (210, 255, 248), 30, font_name='CONSOLAS')
+#    arcade.draw_rectangle_filled(center_x, center_y, RECT_WIDTH, RECT_HEIGHT, arcade.color.BLUE)
+
+    arcade.draw_texture_rectangle(center_x, center_y, 0.4*virus.width, 0.4*virus.height, virus, 0)
+
+    arcade.draw_text("VIRUS", 110, 210, (210, 255, 248), 30, font_name='CONSOLAS')
 
     arcade.draw_text("Score: " + str(score), 100, 50, arcade.color.BLACK, font_name='CONSOLAS')
 
     arcade.draw_texture_rectangle(-320, -240, 640, 480, background_start)
 
     arcade.draw_text("Welcome to the Game \npress 'e' to start", -560, -100, (210, 255, 248), 30, font_name='CONSOLAS')
-    arcade.draw_text("Get close to X , \nbut dont touch him, \ntouching the black block kills you", -560, -200, (210, 255, 248), 15, font_name='CONSOLAS')
-    arcade.draw_text("Time does not matter, \nso if you manage to \nlast long enough for \nX to disapear, \nuse the black block \nto kill yourslef", -560, -300, (210, 255, 248), 15, font_name='CONSOLAS')
+    arcade.draw_text("Avoid the Virus, \nthe aura of antivirus, \ngives you score", -560, -200, (210, 255, 248), 15, font_name='CONSOLAS')
+    arcade.draw_text("Antivirus doesn't \nprotect you completly \nso play smart \njust like being smart online", -560, -300, (210, 255, 248), 15, font_name='CONSOLAS')
     arcade.draw_text("Use W A S D to control", -560, -460, (210, 255, 248), 10, font_name='CONSOLAS')
 
     if dead:
         arcade.set_background_color(arcade.color.RED)
-        arcade.draw_text("You died, your score is " + str(score), 25, HEIGHT - 100, (210, 255, 248), 30, font_name='CONSOLAS')
+        arcade.draw_text("INFECTED, your score is " + str(score), 25, HEIGHT - 100, (210, 255, 248), 30, font_name='CONSOLAS')
         now = time.time()
 
-
-
-
-
+        if restart is True:
+            player_x = WIDTH/2
+            player_y = HEIGHT/2
+            center_x = 100  # Initial x position
+            center_y = 50  # Initial y position
+            delta_x = 3  # change in x
+            delta_y = 1  # change in y
+            score = 0
+            dead = False
 
 def on_key_press(key, modifiers):
-    global up_pressed, start
+    global up_pressed, start, restart
     if key == arcade.key.W:
         up_pressed = True
     global down_pressed
@@ -164,13 +177,26 @@ def on_key_press(key, modifiers):
     global left_pressed
     if key == arcade.key.A:
         left_pressed = True
+
+    if key == arcade.key.UP:
+        up_pressed = True
+    if key == arcade.key.DOWN:
+        down_pressed = True
+    if key == arcade.key.RIGHT:
+        right_pressed = True
+    if key == arcade.key.LEFT:
+        left_pressed = True
+
+
     if key == arcade.key.E:
         start = True
+    if key == arcade.key.R:
+        restart = True
 
 
 
 def on_key_release(key, modifiers):
-    global up_pressed
+    global up_pressed, restart
     if key == arcade.key.W:
         up_pressed = False
     global down_pressed
@@ -183,13 +209,24 @@ def on_key_release(key, modifiers):
     if key == arcade.key.A:
         left_pressed = False
 
+    if key == arcade.key.UP:
+        up_pressed = False
+    if key == arcade.key.DOWN:
+        down_pressed = False
+    if key == arcade.key.RIGHT:
+        right_pressed = False
+    if key == arcade.key.LEFT:
+        left_pressed = False
+    if key == arcade.key.R:
+        restart = False
+
 
 
 def setup():
     arcade.open_window(WIDTH, HEIGHT, "My Arcade Game")
 
     arcade.set_background_color(arcade.color.TROPICAL_RAIN_FOREST)
-    arcade.schedule(on_update, 1 / 60)
+    arcade.schedule(on_update, 1 / 240)
 
     # Override arcade window methods
     window = arcade.get_window()
