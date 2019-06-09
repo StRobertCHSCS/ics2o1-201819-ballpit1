@@ -22,12 +22,16 @@ left_pressed = False
 dead = False
 spawn_protection = True
 respawn = False
+
 #   PLAYER START POSITION
 player_x = WIDTH/2
 player_y = HEIGHT/2
 
-#   PLAYER SPEED
-player_speed = 9
+
+player_speed = 1
+virus_speed_x = 4
+virus_speed_y = 4
+trace_virus_speed = 1
 
 #   AURA RADIUS
 aura_radius = 50
@@ -38,16 +42,9 @@ score = 0
 #   LOAD SCREEN TIMER FOR TIP CYCLING
 loading_timer = 0
 
-#   VIRUS CHASE SPEED (NON TRACING)
-virus_speed_x = 1
-virus_speed_y = 1
-
 #   TRACING VIRUS SPAWN COORDINATES
-tracing_virus_x = WIDTH / 2
-tracing_virus_y = HEIGHT / 2
-
-#   TRACE VIRUS SPEED
-trace_virus_speed = 1
+tracing_virus_x = 100
+tracing_virus_y = 100
 
 #   TITLE DIMENSIONS
 title_x = 100
@@ -56,6 +53,9 @@ title_delta_y = 0.2
 
 #  VIRUS VARIABLES
 viruses = []
+
+#   GAME TIMER
+game_timer = 0
 
 #   LIST OF TIPS THAT CYCLE DURING THE LOAD SCREEN
 title_tips = ["Malware is software that harms your computer",
@@ -80,6 +80,9 @@ load_background = arcade.load_texture("CPT game 2 dir/49373.jpg")
 game_background = arcade.load_texture("CPT game 2 dir/1fe9fd735b4c3b198d10236a5fa592f8.png")
 virus_image = arcade.load_texture("CPT game 2 dir/computer+virus.png")
 trace_virus_image = arcade.load_texture("CPT game 2 dir/67-675122_virus-clipart-black-and-white-virus-icon-png.png")
+easy_button = arcade.load_texture("CPT game 2 dir/Easy button.png")
+medium_button = arcade.load_texture("CPT game 2 dir/Medium button.png")
+hard_button = arcade.load_texture("CPT game 2 dir/Hard button.png")
 
 def game_start_screen():
     global title_x, title_y, title_delta_y
@@ -94,7 +97,10 @@ def game_start_screen():
     arcade.draw_text("Avoid the Virus, \nthe aura of antivirus, \ngives you score \nAntivirus doesn't \nprotect you completly \nso play smart \njust like being \nsmart online", 100, 500, (210, 255, 248), 25, font_name='CONSOLAS')
     arcade.draw_text("Use W A S D to control", 100, 150, (210, 255, 248), 15, font_name='CONSOLAS')
     arcade.draw_texture_rectangle(800, 400, 0.8*button_1.width, 0.8*button_1.height, button_1, 0)
-    arcade.draw_texture_rectangle(705, 300, 0.8*button_video.width, 0.8*button_video.height, button_video, 0)
+  #  arcade.draw_texture_rectangle(705, 300, 0.8*button_video.width, 0.8*button_video.height, button_video, 0)
+    arcade.draw_texture_rectangle(750, 300, easy_button.width, easy_button.height, easy_button)
+    arcade.draw_texture_rectangle(750, 200, medium_button.width, medium_button.height, medium_button)
+    arcade.draw_texture_rectangle(750, 100, hard_button.width, hard_button.height, hard_button)
   #  arcade.draw_circle_filled(705, 300, 5, arcade.color.BLUE)
 
 
@@ -119,9 +125,10 @@ def game_play_screen():
     virus()
     tracing_virus()
     on_collision()
-    arcade.draw_text("Score:    " + str(score), 100, 100, arcade.color.BLACK, 20)
+    arcade.draw_text("Score:    " + str(score), 100, 100, arcade.color.WHITE, 20, font_name='CONSOLAS')
+    arcade.draw_text("Time :    " + str(round((30-game_timer),2)), 800, 600, arcade.color.WHITE, 20, font_name='CONSOLAS')
     if spawn_protection:
-        arcade.draw_text("Spawn Protection is on \npress 't' to disable", WIDTH/2, HEIGHT/2, arcade.color.GREEN, 20)
+        arcade.draw_text("Spawn Protection is on \npress 't' to disable", WIDTH/2, HEIGHT/2, arcade.color.GREEN, 20,font_name= 'CONSOLAS')
 
 
 class Person:
@@ -157,7 +164,7 @@ def virus():
         aura_radius += 0.2
         if aura_radius >= 125:
             aura_radius = 50
-        arcade.draw_circle_filled(viruses[i].x, viruses[i].y, aura_radius,(92, 244, 66, 100))
+        arcade.draw_circle_filled(viruses[i].x, viruses[i].y, aura_radius,(92, 244, 66, 95))
         arcade.draw_texture_rectangle(viruses[i].x, viruses[i].y, 0.5*viruses[i].width, 0.5*viruses[i].height, viruses[i].texture)
 
 
@@ -234,7 +241,7 @@ def on_update(delta_time):
         if left_pressed:
             person.x -= player_speed
 
-    global dead, start_screen, load_screen, viruses, spawn_protection, respawn, score, virus_speed_x, virus_speed_y
+    global dead, start_screen, load_screen, viruses, spawn_protection, respawn, score, virus_speed_x, virus_speed_y, game_timer
     if dead:
         if respawn is True:
             viruses = []
@@ -252,12 +259,17 @@ def on_update(delta_time):
             dead = False
             respawn = False
             score = 0
+            game_timer = 0
     global loading_timer
     if load_screen:
         loading_timer += delta_time
         if loading_timer >= 8:
             load_screen = False
             play_screen = True
+    if spawn_protection == False and dead == False:
+        game_timer += delta_time
+        if game_timer >= 30:
+            dead = True
 
 
 def on_draw():
@@ -287,7 +299,7 @@ def on_key_press(key, modifiers):
 
 
     if play_screen:
-        global up_pressed, down_pressed, right_pressed, left_pressed, player_y, player_x, spawn_protection, score, dead, viruses, respawn
+        global up_pressed, down_pressed, right_pressed, left_pressed, player_y, player_x, spawn_protection, score, dead, viruses, respawn, game_timer
         if key == arcade.key.W:
             up_pressed = True
         if key == arcade.key.S:
@@ -316,6 +328,8 @@ def on_key_press(key, modifiers):
                     Virus(random.randint(25, 1080), random.randint(25, 700), virus_image.width, virus_image.height,
                           virus_image,virus_speed_x ,virus_speed_y))
             dead = False
+            score = 0
+            game_timer = 0
             spawn_protection = True
         if key == arcade.key.T:
             spawn_protection = False
@@ -348,13 +362,30 @@ def on_key_release(key, modifiers):
 
 
 def on_mouse_press(x, y, button, modifiers):
-    global start_screen, play_screen, button_video, load_screen
+    global start_screen, play_screen, button_video, load_screen, easy_button, medium_button, hard_button, easy, medium, hard, mode, virus_speed_y, virus_speed_x, player_speed, trace_virus_speed
     if start_screen:
         if (x > 800 - (button_1.width)/2 and x < 800 + (button_1.width)/2 and y > 400 - (button_1.height)/2 and y < 400 + (button_1.height)/2):
             print("click")
+            player_speed = 5
+            trace_virus_speed = 2.5
             start_screen = False
             load_screen = True
-
+        if (x > 750 - (easy_button.width)/2 and x < 800 + (easy_button.width)/2 and y > 300 - (easy_button.height)/2 and y < 300 + (easy_button.height)/2):
+            print("yes")
+            player_speed = 9
+            trace_virus_speed = 1.2
+            start_screen = False
+            load_screen = True
+        if (x > 750 - (medium_button.width)/2 and x < 800 + (medium_button.width)/2 and y > 200 - (medium_button.height)/2 and y < 200 + (medium_button.height)/2):
+            player_speed = 7
+            trace_virus_speed = 2.2
+            start_screen = False
+            load_screen = True
+        if (x > 750 - (hard_button.width) / 2 and x < 800 + (hard_button.width) / 2 and y > 100 - (hard_button.width) / 2 and y < 100 + (hard_button.height) / 2):
+            player_speed = 5
+            trace_virus_speed = 2.7
+            start_screen = False
+            load_screen = True
 
 def setup():
     arcade.open_window(WIDTH, HEIGHT, "My Arcade Game")
