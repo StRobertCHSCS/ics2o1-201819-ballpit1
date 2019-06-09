@@ -56,19 +56,18 @@ viruses = []
 
 #   GAME TIMER
 game_timer = 0
+game_length = 20
 
 #   LIST OF TIPS THAT CYCLE DURING THE LOAD SCREEN
 title_tips = ["Malware is software that harms your computer",
               "Keep your computer up to date with frequent updates",
               "Report cyberbullying to adults you trust",
-              "A Trojan is a virus that disguises itself as helpful",
+              "A Trojan is a virus that \ndisguises itself as helpful",
               "If computer starts lagging with lots of Chrome tabs open, \nit may be time to upgrade the RAM",
               "Avoid downloading software that seems to be \n'too good to be true'",
               "Don't give out your personal information online"]
 
 tip_1 = random.randint(0, len(title_tips)-1)
-
-
 tip_2 = random.randint(0, len(title_tips)-1)
 
 
@@ -85,7 +84,7 @@ medium_button = arcade.load_texture("CPT game 2 dir/Medium button.png")
 hard_button = arcade.load_texture("CPT game 2 dir/Hard button.png")
 
 def game_start_screen():
-    global title_x, title_y, title_delta_y
+    global title_x, title_y, title_delta_y, loading_timer
     arcade.draw_texture_rectangle(475, HEIGHT/2,0.7*start_background.width,0.7*start_background.height, start_background, 0)
     title_y += title_delta_y
     if title_y >= 610:
@@ -102,20 +101,42 @@ def game_start_screen():
     arcade.draw_texture_rectangle(750, 200, medium_button.width, medium_button.height, medium_button)
     arcade.draw_texture_rectangle(750, 100, hard_button.width, hard_button.height, hard_button)
   #  arcade.draw_circle_filled(705, 300, 5, arcade.color.BLUE)
+    loading_timer = 0
 
 
 def game_load_screen():
-    global load_screen, play_screen, tip_1
+    global load_screen, play_screen, tip_1, aura_radius
     arcade.set_background_color(arcade.color.BLUE)
     arcade.draw_texture_rectangle(WIDTH/2, HEIGHT/2, 0.7*load_background.width, 0.7*load_background.height, load_background,0)
-   # arcade.draw_text("load screen, Press e to continue", WIDTH/2, HEIGHT/2, arcade.color.PINK_LAVENDER, 30 )
-    arcade.draw_text("LOADING", 450, 550, arcade.color.PINK_LAVENDER, 30)
+    arcade.draw_text("LOADING", 100, 550, arcade.color.PINK_LAVENDER, 60, font_name='CONSOLAS')
+
+    #   LOADING DOT ANIMATION
+    if loading_timer >= 1.5:
+        arcade.draw_circle_filled(425, 550, 5, arcade.color.PINK_LAVENDER)
+    if loading_timer >= 3:
+        arcade.draw_circle_filled(450, 550, 5, arcade.color.PINK_LAVENDER)
+    if loading_timer >= 4.5:
+        arcade.draw_circle_filled(475, 550, 5, arcade.color.PINK_LAVENDER)
+
+    arcade.draw_texture_rectangle(100,100, 0.5*virus_image.width, 0.5*virus_image.height, virus_image)
+    arcade.draw_text("Don't touch this virus", 150, 100, arcade.color.PINK_LAVENDER, 15, font_name= 'CONSOLAS')
+    arcade.draw_texture_rectangle(500, 100, 0.15*trace_virus_image.width, 0.15*trace_virus_image.height, trace_virus_image)
+    arcade.draw_text("Don't touch this one either, \nthis one chases you", 550, 100, arcade.color.PINK_LAVENDER, 15, font_name='CONSOLAS')
+    arcade.draw_circle_filled(100, 250, 25, arcade.color.BLACK)
+    arcade.draw_text("This is you",150, 250, arcade.color.PINK_LAVENDER, 15, font_name='CONSOLAS')
+
+    #   AURA INSTRUCTION ANIMATION
+    aura_radius += 0.4
+    if aura_radius >= 100:
+        aura_radius = 50
+    arcade.draw_circle_filled(500, 250, aura_radius, (92, 244, 66, 95))
+    arcade.draw_text("Stay within this Aura to gain points", 550, 250, arcade.color.PINK_LAVENDER, 15, font_name='CONSOLAS')
     if loading_timer <= 4:
-        arcade.draw_text(title_tips[tip_1], 100, HEIGHT / 2,
-                         arcade.color.PINK_LAVENDER, 30)
+        arcade.draw_text(title_tips[tip_1], 100, 425,
+                         arcade.color.PINK_LAVENDER, 25, font_name='CONSOLAS')
     if loading_timer > 4:
-        arcade.draw_text(title_tips[tip_2], 100, HEIGHT / 2,
-                         arcade.color.PINK_LAVENDER, 30)
+        arcade.draw_text(title_tips[tip_2], 100, 425,
+                         arcade.color.PINK_LAVENDER, 25, font_name='CONSOLAS')
 
 
 def game_play_screen():
@@ -126,7 +147,7 @@ def game_play_screen():
     tracing_virus()
     on_collision()
     arcade.draw_text("Score:    " + str(score), 100, 100, arcade.color.WHITE, 20, font_name='CONSOLAS')
-    arcade.draw_text("Time :    " + str(round((30-game_timer),2)), 800, 600, arcade.color.WHITE, 20, font_name='CONSOLAS')
+    arcade.draw_text("Time :    " + str(round((game_length-game_timer),2)), 800, 600, arcade.color.WHITE, 20, font_name='CONSOLAS')
     if spawn_protection:
         arcade.draw_text("Spawn Protection is on \npress 't' to disable", WIDTH/2, HEIGHT/2, arcade.color.GREEN, 20,font_name= 'CONSOLAS')
 
@@ -225,7 +246,7 @@ def on_collision():
         if dead is False:
             for i in range(len(viruses)):
                 distance = ((person.x - viruses[i].x) ** 2 + (person.y - viruses[i].y) ** 2) ** 0.5
-                if distance <= 200:
+                if distance <= 150:
                     score += 2
 
 
@@ -241,7 +262,7 @@ def on_update(delta_time):
         if left_pressed:
             person.x -= player_speed
 
-    global dead, start_screen, load_screen, viruses, spawn_protection, respawn, score, virus_speed_x, virus_speed_y, game_timer
+    global dead, start_screen, load_screen, viruses, spawn_protection, respawn, score, virus_speed_x, virus_speed_y, game_timer, game_length
     if dead:
         if respawn is True:
             viruses = []
@@ -268,7 +289,7 @@ def on_update(delta_time):
             play_screen = True
     if spawn_protection == False and dead == False:
         game_timer += delta_time
-        if game_timer >= 30:
+        if game_timer >= game_length:
             dead = True
 
 
@@ -288,6 +309,7 @@ def on_draw():
 
     if dead:
         arcade.draw_text("You died, your score was "+ str(score) +  "\n press 'f' to reset", title_x, title_y, (210, 255, 248), 30, font_name='CONSOLAS')
+        arcade.draw_text("Press 'r' to return to main menu", 500 , 100, (210, 255, 248), 15, font_name='CONSOLAS' )
 
 def on_key_press(key, modifiers):
     global start_screen, play_screen, load_screen
@@ -388,7 +410,7 @@ def on_mouse_press(x, y, button, modifiers):
             load_screen = True
 
 def setup():
-    arcade.open_window(WIDTH, HEIGHT, "My Arcade Game")
+    arcade.open_window(WIDTH, HEIGHT, "Aura Antivirus")
     arcade.set_background_color(arcade.color.WHITE)
     arcade.schedule(on_update, 1 / 240)
 
