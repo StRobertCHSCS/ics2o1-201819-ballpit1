@@ -1,3 +1,14 @@
+'''
+------------------------------------------------------------------------------------------------------------------------
+Name:       CPT GAME2.py
+Purpose:    Aura Antivirus game CPT
+
+Author: Jason Tai
+
+Created:    11/06/2019
+------------------------------------------------------------------------------------------------------------------------
+'''
+
 import arcade
 import random
 
@@ -436,6 +447,7 @@ def on_mouse_press(x, y, button, modifiers):
             trace_virus_speed = 2.5
             start_screen = False
             load_screen = True
+
         if (x > 750 - (easy_button.width) / 2 and x < 800 + (easy_button.width) / 2 and y > 300 - (
                 easy_button.height) / 2 and y < 300 + (easy_button.height) / 2):
             print("yes")
@@ -443,12 +455,14 @@ def on_mouse_press(x, y, button, modifiers):
             trace_virus_speed = 1.2
             start_screen = False
             load_screen = True
+
         if (x > 750 - (medium_button.width) / 2 and x < 800 + (medium_button.width) / 2 and y > 200 - (
                 medium_button.height) / 2 and y < 200 + (medium_button.height) / 2):
             player_speed = 7
             trace_virus_speed = 2.2
             start_screen = False
             load_screen = True
+
         if (x > 750 - (hard_button.width) / 2 and x < 800 + (hard_button.width) / 2 and y > 100 - (
                 hard_button.width) / 2 and y < 100 + (hard_button.height) / 2):
             player_speed = 5
@@ -459,6 +473,7 @@ def on_mouse_press(x, y, button, modifiers):
 #   BUTTON HOVER ANIMATION
 def mouse(x, y, dx, dy):
     global expansion, transparency_button_1, transparency_easy_button, transparency_medium_button, transparency_hard_button, expansion_button_1, expansion_easy_button, expansion_medium_button, expansion_hard_button
+
     if (x > 800 - (button_1.width) / 2 and x < 800 + (button_1.width) / 2 and y > 400 - (
             button_1.height) / 2 and y < 400 + (button_1.height) / 2):
         expansion_button_1 = -5
